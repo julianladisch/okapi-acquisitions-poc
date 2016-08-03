@@ -1,0 +1,14 @@
+{
+  "id" : "okapi-acquisitons-module",
+  "name" : "Acquisitions PoC Module",
+  "provides" : [ {
+    "id" : "acquisitions",
+    "version" : "0.0.1"
+  } ],
+  "routingEntries" : [ {
+    "methods" : [ "GET", "POST" ],
+    "path" : "/acq",
+    "level" : "30",
+    "type" : "request-response"
+  } ]
+}
