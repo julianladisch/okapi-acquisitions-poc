@@ -19,7 +19,6 @@ public class MainVerticle extends AbstractVerticle {
   private static final String TEXT = "text/plain";
   private static final String HTML = "text/html";
   private static final String X_OKAPI_TENANT = "X-Okapi-Tenant";
-  private static final int CIRC_API_PORT = 8081;
   private static final int ACQ_API_PORT = 8082;
   private static final String SERVER = "localhost";
   private static final String TENANT = "hbz";
@@ -50,6 +49,8 @@ public class MainVerticle extends AbstractVerticle {
     router.get   ("/acq/invoices/:id").produces(JSON).handler(r -> this.listAcq  (r, "/apis/invoices"));
     router.put   ("/acq/invoices/:id")               .handler(r -> this.putAcq   (r, "/apis/invoices"));
     router.delete("/acq/invoices/:id").produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/invoices"));
+
+    router.getWithRegex("/acq/[a-zA-Z0-9._-]+(\\.css|\\.js)").handler(this::sendFile);
 
     vertx.createHttpServer().requestHandler(router::accept).listen(port, result -> {
       if (result.succeeded()) {
@@ -114,10 +115,6 @@ public class MainVerticle extends AbstractVerticle {
   
   private void listAcq(RoutingContext routingContext, String path) {
     list(routingContext, ACQ_API_PORT, path);
-  }
-  
-  private void listCirc(RoutingContext routingContext, String path) {
-    list(routingContext, CIRC_API_PORT, path);
   }
 
   private void delete(RoutingContext routingContext, int port, String path) {
@@ -275,5 +272,38 @@ public class MainVerticle extends AbstractVerticle {
     content = content.replace('\'', '"');
     
     post(routingContext, ACQ_API_PORT, "/apis/invoices", content);
+  }
+
+  /**
+   * Extract the name (the last component) of a path.
+   * path2name("") = ""
+   * path2name("/") = ""
+   * path2name("a.htm") = "a.htm"
+   * path2name("/a/b/") = ""
+   * path2name("/a/b/c.htm") = "c.htm"
+   * @param path - where to search for the name
+   * @return last component of the path, may be an empty string
+   */
+  private String path2name(String path) {
+    int slashPos = path.lastIndexOf('/');
+    if (slashPos < 0 || path.isEmpty()) {
+      return path;
+    }
+    return path.substring(slashPos + 1);
+  }
+
+  private void sendFile(RoutingContext context) {
+    String [] whitelist = {
+      "META-INF/resources/webjars/bootstrap/3.3.7/css/bootstrap.min.css",
+      "META-INF/resources/webjars/jquery/1.11.1/jquery.min.js"
+    };
+    String slashName = "/" + path2name(context.request().path());
+    for (String file : whitelist) {
+      if (file.endsWith(slashName)) {
+        context.response().sendFile(file);
+        return;
+      }
+    }
+    context.response().setStatusCode(404).end("File not found: " + context.request().path());
   }
 }
