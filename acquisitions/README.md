@@ -11,12 +11,12 @@ mvn clean install
 cd ../acquisitions
 mvn clean install
 cd ..
-java -jar circulation/target/circulation-fat.jar   -conf http.port=8081
+java -jar circulation/target/circulation-fat.jar   -conf '{ "http.port": 8081 }'
 ```
 
 In second command shell:
 ```
-java -jar acquisitions/target/acquisitions-fat.jar -conf http.port=8082
+java -jar acquisitions/target/acquisitions-fat.jar -conf '{ "http.port": 8082 }'
 ```
 
 ## Install and run the acq module
