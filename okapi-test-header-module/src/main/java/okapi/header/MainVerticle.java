@@ -26,7 +26,7 @@ import java.lang.management.ManagementFactory;
 
 public class MainVerticle extends AbstractVerticle {
 
-  private final Logger logger = LoggerFactory.getLogger("okapi-header");
+  private final Logger logger = LoggerFactory.getLogger("okapi-test-header-module");
 
   public void my_header_handle(RoutingContext ctx) {
     String h = ctx.request().getHeader("X-my-header");
@@ -47,10 +47,10 @@ public class MainVerticle extends AbstractVerticle {
     Router router = Router.router(vertx);
 
     final int port = Integer.parseInt(System.getProperty("port", "8080"));
-    logger.info("Starting header " + ManagementFactory.getRuntimeMXBean().getName() + " on port " + port);
+    logger.info("Starting okapi-test-header-module " + ManagementFactory.getRuntimeMXBean().getName() + " on port " + port);
 
-    router.get("/sample").handler(this::my_header_handle);
-    router.post("/sample").handler(this::my_header_handle);
+    router.get("/testb").handler(this::my_header_handle);
+    router.post("/testb").handler(this::my_header_handle);
 
     vertx.createHttpServer()
             .requestHandler(router::accept)
@@ -61,7 +61,7 @@ public class MainVerticle extends AbstractVerticle {
                         fut.complete();
                       } else {
                         fut.fail(result.cause());
-                        logger.error("header failed: " + result.cause());
+                        logger.error("okapi-test-header-module failed: " + result.cause());
                       }
                     }
             );

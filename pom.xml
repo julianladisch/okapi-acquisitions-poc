@@ -13,15 +13,15 @@
 
   <modules>
     <module>okapi-common</module>
-    <module>okapi-sample-module</module>
-    <module>okapi-auth</module>
-    <module>okapi-header-module</module>
+    <module>okapi-test-module</module>
+    <module>okapi-test-auth-module</module>
+    <module>okapi-test-header-module</module>
     <!-- okapi-core must be last because its tests rely on the previous ones -->
     <module>okapi-core</module>
   </modules>
 
   <prerequisites>
-    <maven>3.1.1</maven>
+    <maven>3.3.1</maven>
   </prerequisites>
 
   <licenses>
