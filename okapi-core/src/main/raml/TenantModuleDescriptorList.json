@@ -1,8 +1,0 @@
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "TenantModuleDescriptorList",
-  "type": "array",
-  "items": {
-    "$ref": "TenantModuleDescriptor.json"
-  }
-}

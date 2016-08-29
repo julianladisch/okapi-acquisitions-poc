@@ -1,39 +1,37 @@
+# Okapi Acquisitions Proof-of-Concept Module
 
-Okapi — a multitenant API Gateway
-=================================
+## Install lsp-apis-impl, run embedded MongoDB with circulation and acquisitions data 
 
-System requirements
--------------------
+```
+git clone https://github.com/sling-incubator/lsp-apis-impl/
+cd lsp-apis-impl/domain-models-poc
+mvn clean install 
+cd ../circulation
+mvn clean install
+cd ../acquisitions
+mvn clean install
+cd ..
+java -jar circulation/target/circulation-fat.jar   -conf '{ "http.port": 8081 }'
+```
 
-The Okapi software has the following compile-time dependencies:
+In second command shell:
+```
+java -jar acquisitions/target/acquisitions-fat.jar -conf '{ "http.port": 8082 }'
+```
 
-* Java 8
+## Install and run the acq module
 
-* Apache Maven 3.3.x or higher
+```
+git clone https://github.com/julianladisch/okapi-acquisitions-poc/
+cd okapi-acquisitions-poc
+mvn package -DskipTests
+java -jar target/okapi-acquisitions-poc-fat.jar
+```
 
-In addition, the test suite must be able to bind to ports 9130-9134 to succeed.
-
-*Note: If tests fail, the API Gateway may be unable in some cases to shut down
-microservices that it has spawned, and they may need to be terminated
-manually.*
-
-Quick start
------------
-
-To build and run:
-
-    $ mvn install
-    $ mvn exec:exec
-
-Okapi listens on port 9130.
-
-Documentation
--------------
-
-* [Okapi Guide and Reference](doc/guide.md)
-* [Contributing guidelines](CONTRIBUTING.md)
-
-License
--------
-
-Licensed under the Apache License, Version 2.0 (see [LICENSE](LICENSE)).
+## Try it out
+Open browser at `http://localhost:8079/acq/invoices`
+Or try JSON request:
+```
+curl http://localhost:8079/acq/invoices -H "Accept: application/json"
+curl http://localhost:8079/acq/funds    -H "Accept: application/json"
+```
