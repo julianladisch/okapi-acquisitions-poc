@@ -5,7 +5,7 @@
   http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.folio.okapi-qcquisitions-poc</groupId>
+  <groupId>org.folio.okapi-acquisitions-poc</groupId>
   <artifactId>okapi-acquisitions-poc</artifactId>
   <packaging>jar</packaging>
   <version>0.4-SNAPSHOT</version>
@@ -77,15 +77,9 @@
     </dependency>
 
     <dependency>
-      <groupId>sling</groupId>
-      <artifactId>domain-models-api-interfaces</artifactId>
+      <groupId>com.folio</groupId>
+      <artifactId>acquisitions</artifactId>
       <version>0.0.1-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jackson-annotations</artifactId>
-          <groupId>com.fasterxml.jackson.core</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->

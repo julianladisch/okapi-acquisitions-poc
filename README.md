@@ -1,30 +1,27 @@
 # Okapi Acquisitions Proof-of-Concept Module
 
-## Install lsp-apis-impl, run embedded MongoDB with circulation and acquisitions data 
+## Install and run raml module for acquisitions data 
 
 ```
-git clone https://github.com/sling-incubator/lsp-apis-impl/
-cd lsp-apis-impl/domain-models-poc
+git clone https://github.com/folio-org/raml-module-builder.git
+cd raml-module-builder/
 mvn clean install 
-cd ../circulation
-mvn clean install
-cd ../acquisitions
-mvn clean install
 cd ..
-java -jar circulation/target/circulation-fat.jar   -conf '{ "http.port": 8081 }'
-```
 
-In second command shell:
-```
-java -jar acquisitions/target/acquisitions-fat.jar -conf '{ "http.port": 8082 }'
+git clone https://github.com/folio-org/mod-acquisitions.git
+cd mod-acquisitions
+mvn clean install
+java -jar target/acquisitions-fat.jar -conf '{ "http.port": 8082 }'
 ```
 
 ## Install and run the acq module
 
+Use a second shell:
+
 ```
 git clone https://github.com/julianladisch/okapi-acquisitions-poc/
 cd okapi-acquisitions-poc
-mvn package -DskipTests
+mvn package
 java -jar target/okapi-acquisitions-poc-fat.jar
 ```
 
