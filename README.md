@@ -1,5 +1,7 @@
 # Okapi Acquisitions Proof-of-Concept Module
 
+This explains how to install and run this module.
+
 ## Install and run raml module for acquisitions data 
 
 ```
