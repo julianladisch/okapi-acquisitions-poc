@@ -77,7 +77,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.folio</groupId>
+      <groupId>org.folio</groupId>
       <artifactId>acquisitions</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
