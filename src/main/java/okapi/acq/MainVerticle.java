@@ -1,5 +1,6 @@
 package okapi.acq;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,11 +32,11 @@ public class MainVerticle extends AbstractVerticle {
     Router router = Router.router(vertx);
     final int port = Integer.parseInt(System.getProperty("port", "8079"));
     router.route("/acq/*").handler(BodyHandler.create());
-    
+
     router.get   ("/acq/funds"       ).produces(HTML).handler(r -> this.html     (r, "templates/funds.html"));
     router.get   ("/acq/funds"       ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/funds"));
     router.post  ("/acq/funds"       )               .handler(this::createFund);
-    
+
     router.get   ("/acq/funds/:id"   ).produces(HTML).handler(r -> this.html     (r, "templates/fund.html"));
     router.get   ("/acq/funds/:id"   ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/funds"));
     router.put   ("/acq/funds/:id"   )               .handler(r -> this.putAcq   (r, "/apis/funds"));
@@ -44,11 +45,20 @@ public class MainVerticle extends AbstractVerticle {
     router.get   ("/acq/invoices"    ).produces(HTML).handler(r -> this.html     (r, "templates/invoices.html"));
     router.get   ("/acq/invoices"    ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/invoices"));
     router.post  ("/acq/invoices"    )               .handler(this::createInvoice);
-    
+
     router.get   ("/acq/invoices/:id").produces(HTML).handler(r -> this.html     (r, "templates/invoice.html"));
     router.get   ("/acq/invoices/:id").produces(JSON).handler(r -> this.listAcq  (r, "/apis/invoices"));
     router.put   ("/acq/invoices/:id")               .handler(r -> this.putAcq   (r, "/apis/invoices"));
     router.delete("/acq/invoices/:id").produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/invoices"));
+
+    router.get   ("/acq/po_lines"    ).produces(HTML).handler(r -> this.html     (r, "templates/po_lines.html"));
+    router.get   ("/acq/po_lines"    ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/po_lines"));
+    router.post  ("/acq/po_lines"    )               .handler(this::createPoLine);
+
+    router.get   ("/acq/po_lines/:id").produces(HTML).handler(r -> this.html     (r, "templates/po_line.html"));
+    router.get   ("/acq/po_lines/:id").produces(JSON).handler(r -> this.listAcq  (r, "/apis/po_lines"));
+    router.put   ("/acq/po_lines/:id")               .handler(r -> this.putAcq   (r, "/apis/po_lines"));
+    router.delete("/acq/po_lines/:id").produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/po_lines"));
 
     router.getWithRegex("/acq/[a-zA-Z0-9._-]+(\\.css|\\.js)").handler(this::sendFile);
 
@@ -65,18 +75,16 @@ public class MainVerticle extends AbstractVerticle {
       String id = routingContext.request().getParam("id");
       return (id == null) ? path : path + "/" + id;
   }
-  
+
   private Buffer resource(String filePath) {
-    try {
-      InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+    try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath)) {
       if (stream == null) {
-        logger.error("Resource not found: ", filePath);
-        return null;
+        throw new FileNotFoundException(filePath);
       }
       Buffer buffer = Buffer.buffer(stream.available());
       int length;
       byte[] data = new byte[16384];
-  
+
       while (true) {
         length = stream.read(data);
         if (length < 0) {  // end of file
@@ -84,7 +92,7 @@ public class MainVerticle extends AbstractVerticle {
         }
         buffer.appendBytes(data, 0, length);
       }
-  
+
       return buffer;
     }
     catch (IOException e) {
@@ -92,11 +100,11 @@ public class MainVerticle extends AbstractVerticle {
     }
     return null;
   }
-  
+
   private void html(RoutingContext routingContext, String filePath) {
     routingContext.response().setStatusCode(200).putHeader(CONTENT_TYPE, HTML).end(resource(filePath));
   }
-  
+
   private void list(RoutingContext routingContext, int port, String path) {
     HttpClient httpClient = vertx.createHttpClient();
     httpClient.get(port, SERVER, finalPath(routingContext, path),
@@ -112,7 +120,7 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(X_OKAPI_TENANT, TENANT)
         .end();
   }
-  
+
   private void listAcq(RoutingContext routingContext, String path) {
     list(routingContext, ACQ_API_PORT, path);
   }
@@ -133,11 +141,11 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(X_OKAPI_TENANT, TENANT)
         .end();
   }
-  
+
   private void deleteAcq(RoutingContext routingContext, String path) {
     delete(routingContext, ACQ_API_PORT, path);
   }
-  
+
   private void put(RoutingContext routingContext, int port, String path) {
     HttpClient httpClient = vertx.createHttpClient();
     httpClient.put(port, SERVER, finalPath(routingContext, path),
@@ -155,11 +163,11 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(X_OKAPI_TENANT, TENANT)
         .end(routingContext.getBody());
   }
-  
+
   private void putAcq(RoutingContext routingContext, String path) {
     put(routingContext, ACQ_API_PORT, path);
   }
-  
+
   private void post(RoutingContext routingContext, int port, String path, String content) {
     HttpClient httpClient = vertx.createHttpClient();
     httpClient.post(port, SERVER, path,
@@ -177,12 +185,10 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(X_OKAPI_TENANT, TENANT)
         .end(content);
   }
-  
+
   private void createFund(RoutingContext routingContext) {
-    String id = Long.toString(Math.round(Math.random() * 999999999));
-    String content = 
+    String content =
         "{"
-      + "  '_id' : '" + id + "',"
       + "  'code' : 'Bioebooks',"
       + "  'name' : 'ebooks for Biology',"
       + "  'status' : {"
@@ -200,15 +206,13 @@ public class MainVerticle extends AbstractVerticle {
       + "  }"
       + "}";
     content = content.replace('\'', '"');
-    
+
     post(routingContext, ACQ_API_PORT, "/apis/funds", content);
   }
-  
+
   private void createInvoice(RoutingContext routingContext) {
-    String id = Long.toString(Math.round(Math.random() * 999999999));
     String content =
         "{"
-      + "  '_id': '" + id + "',"
       + "  'vendor_invoice_number': '1234567890',"
       + "  'invoice_date': '1975-03-30',"
       + "  'total_amount': 100,"
@@ -270,8 +274,75 @@ public class MainVerticle extends AbstractVerticle {
       + "  'invoice_line': []"
       + "}";
     content = content.replace('\'', '"');
-    
+
     post(routingContext, ACQ_API_PORT, "/apis/invoices", content);
+  }
+
+  private void createPoLine(RoutingContext routingContext) {
+    String content =
+        "{"
+      + "  'po_line_status': {"
+      + "    'value': 'SENT',"
+      + "    'desc': 'sent to vendor'"
+      + "  },"
+      + "  'owner': {"
+      + "    'value': 'MITLIBMATH',"
+      + "    'desc': 'Math Library'"
+      + "  },"
+      + "  'type': {"
+      + "    'value': 'PRINT_ONETIME',"
+      + "    'desc': ''"
+      + "  },"
+      + "  'vendor': {"
+      + "    'value': 'YBP',"
+      + "    'desc': ''"
+      + "  },"
+      + "  'vendor_account_CODE': 'YBP_CODE',"
+      + "  'acquisition_method_CODE': {"
+      + "    'value': 'VENDOR_SYSTEM',"
+      + "    'desc': 'Purchased at Vendor System'"
+      + "  },"
+      + "  'rush': false,"
+      + "  'price': {"
+      + "    'sum': '150.0',"
+      + "    'po_currency': {"
+      + "      'value': 'USD',"
+      + "      'desc': 'US Dollar'"
+      + "    }"
+      + "  },"
+      + "  'fund_distributions': ["
+      + "    {"
+      + "      'fund_code': 'Bioebooks',"
+      + "      'amount': {"
+      + "        'sum': 123.5,"
+      + "        'currency': 'USD'"
+      + "      }"
+      + "    }"
+      + "  ],"
+      + "  'vendor_reference_number': 'ybp-1234567890',"
+      + "  'ebook_url': '',"
+      + "  'source_type': 'API',"
+      + "  'po_number': '0987654321',"
+      + "  'invoice_reference': '',"
+      + "  'resource_metadata': '/abc/v1/bibs/99113721800121',"
+      + "  'access_provider': '',"
+      + "  'material_type': 'BOOK',"
+      + "  'block_alert_on_po_line': ["
+      + "    {"
+      + "      'value': 'FUNDMISS',"
+      + "      'desc': 'Fund is missing'"
+      + "    }"
+      + "  ],"
+      + "  'note': [],"
+      + "  'location': [],"
+      + "  'created_date': '',"
+      + "  'update_date': '',"
+      + "  'renewal_period': '',"
+      + "  'renewal_date': ''"
+      + "}";
+    content = content.replace('\'', '"');
+
+    post(routingContext, ACQ_API_PORT, "/apis/po_lines", content);
   }
 
   /**
@@ -286,7 +357,7 @@ public class MainVerticle extends AbstractVerticle {
    */
   private String path2name(String path) {
     int slashPos = path.lastIndexOf('/');
-    if (slashPos < 0 || path.isEmpty()) {
+    if (slashPos < 0) {
       return path;
     }
     return path.substring(slashPos + 1);

@@ -16,7 +16,8 @@
       <div class="row">
         <div class="col-md-6">
           <a href="/acq/funds">Funds</a> |
-          <a href="/acq/invoices">Invoices</a>
+          <a href="/acq/invoices">Invoices</a> |
+          <a href="/acq/po_lines">POLines</a>
         </div>
         <div class="col-md-6">
           <button class="btn btn-primary" type="button" id="reload">reload list of funds</button>
@@ -79,7 +80,7 @@
             $('#error').show();
           }
         });
-      })
+      });
       $('#reload').click();
     });
     /*]]>*/

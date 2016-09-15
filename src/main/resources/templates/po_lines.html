@@ -2,34 +2,34 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Invoices</title>
+  <title>POLines</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel="stylesheet" href="/acq/bootstrap.min.css" />
   <script src="/acq/jquery.min.js"></script>
 </head>
 <body>
-	<div class="container">
-		<div class="jumbotron">
-			<h2>List of Invoices</h2>
-		</div>
-		<div class="page-header">
-			<div class="row">
+  <div class="container">
+    <div class="jumbotron">
+      <h2>List of POLines</h2>
+    </div>
+    <div class="page-header">
+      <div class="row">
         <div class="col-md-6">
           <a href="/acq/funds">Funds</a> |
           <a href="/acq/invoices">Invoices</a> |
           <a href="/acq/po_lines">POLines</a>
         </div>
         <div class="col-md-6">
-          <button class="btn btn-primary" type="button" id="reload">reload list of invoices</button>
-          <button class="btn btn-primary" type="button" id="new">create new invoice</button>
+          <button class="btn btn-primary" type="button" id="reload">reload list of po lines</button>
+          <button class="btn btn-primary" type="button" id="new">create new po line</button>
         </div>
         <div class="col-md-6"></div>
         <div class="col-md-12">
           <br />
-          <div class="alert alert-success" role="alert" id="success" style="display: none;"></div>
-          <div class="alert alert-danger"  role="alert" id="error"   style="display: none;"></div>
+          <div class="alert alert-success" id="success" style="display: none;"></div>
+          <div class="alert alert-danger"  id="error"   style="display: none;"></div>
           <br />
-          Invoices: <span id="count"></span>
+          Funds: <span id="count"></span>
           <br />
           <table class="table"></table>
         </div>
@@ -49,7 +49,8 @@
           cache: false,
           headers: { Accept : "application/json" },
           success: function(json) {
-            window.location.href = "invoices/" + json._id;
+            window.location.href = "po_lines/" + json._id;
+            $('#error').text(json);
           },
           error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('#error').text(XMLHttpRequest.responseText);
@@ -63,16 +64,17 @@
           type: "GET",
           cache: false,
           headers: { Accept : "application/json" },
-          success: function(json){
+          success: function(json) {
             $('#count').text(json.total_records);
             $('table').empty();
-            $('table').append('<tr><th>id</th><th>total amount</th><th>payment status</th></tr>');
-            for (var i = 0; i < json.invoices.length; i++) {
-              var invoice = json.invoices[i];
+            $('table').append('<tr><th>id</th><th>status</th><th>vendor</th><th>price</th></tr>');
+            for (var i = 0; i < json.po_lines.length; i++) {
+              var po_line = json.po_lines[i];
               $('table').append('<tr>'
-                  + "<td><a href='invoices/" + invoice._id + "'>" + invoice._id + "</a></td>"
-                  + "<td>" + invoice.total_amount + " " + invoice.currency.value + "</td>"
-                  + "<td>" + invoice.payment.payment_status + "</td>");
+                  + "<td><a href='po_lines/" + po_line._id + "'>" + po_line._id + "</a></td>"
+                  + "<td>" + po_line.po_line_status.value + "</td>"
+                  + "<td>" + po_line.vendor.value + "</td>"
+                  + "<td>" + po_line.price.sum + " " + po_line.price.po_currency.value + "</td>");
             }
           },
           error: function(XMLHttpRequest, textStatus, errorThrown) {

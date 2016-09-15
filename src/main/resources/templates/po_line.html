@@ -2,7 +2,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Invoice</title>
+  <title>PO Line</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel="stylesheet" href="/acq/bootstrap.min.css" />
   <script src="/acq/jquery.min.js"></script>
@@ -10,7 +10,7 @@
 <body>
   <div class="container">
     <div class="jumbotron">
-      <h2>Fund</h2>
+      <h2>PO Line</h2>
     </div>
     <div class="page-header">
       <div class="row">
@@ -41,6 +41,7 @@
         $('#success').hide();
         $('#error').hide();
       });
+      
       $('#reload').click(function() {
         $('#json').empty();
         $.ajax({
