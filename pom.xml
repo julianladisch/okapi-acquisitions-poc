@@ -143,4 +143,10 @@
     </plugins>
   </build>
 
+  <scm>
+    <url>https://github.com/julianladisch/okapi-acquisitions-poc</url>
+    <connection>scm:git:git://github.com/julianladisch/okapi-acquisitions-poc.git</connection>
+    <developerConnection>scm:git:git@github.com:julianladisch/okapi-acquisitions-poc.git</developerConnection>
+  </scm>
+
 </project>
