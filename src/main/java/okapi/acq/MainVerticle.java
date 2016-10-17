@@ -1,5 +1,9 @@
 package okapi.acq;
 
+import static io.vertx.core.http.HttpHeaders.ACCEPT;
+import static io.vertx.core.http.HttpHeaders.AUTHORIZATION;
+import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +17,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-import static io.vertx.core.http.HttpHeaders.*;
 
 public class MainVerticle extends AbstractVerticle {
   private static final String JSON = "application/json";
@@ -23,7 +26,10 @@ public class MainVerticle extends AbstractVerticle {
   private static final int ACQ_API_PORT = 8082;
   private static final String SERVER = "localhost";
   private static final String TENANT = "hbz";
-  String authorization = "a2VybWl0Omtlcm1pdA";
+  private static final String authorization = "a2VybWl0Omtlcm1pdA";
+  private static final String DMOD_FUNDS = "/funds";
+  private static final String DMOD_INVOICES = "/invoices";
+  private static final String DMOD_PO_LINES = "/po_lines";
 
   private final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
 
@@ -34,31 +40,31 @@ public class MainVerticle extends AbstractVerticle {
     router.route("/acq/*").handler(BodyHandler.create());
 
     router.get   ("/acq/funds"       ).produces(HTML).handler(r -> this.html     (r, "templates/funds.html"));
-    router.get   ("/acq/funds"       ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/funds"));
+    router.get   ("/acq/funds"       ).produces(JSON).handler(r -> this.listAcq  (r, DMOD_FUNDS));
     router.post  ("/acq/funds"       )               .handler(this::createFund);
 
     router.get   ("/acq/funds/:id"   ).produces(HTML).handler(r -> this.html     (r, "templates/fund.html"));
-    router.get   ("/acq/funds/:id"   ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/funds"));
-    router.put   ("/acq/funds/:id"   )               .handler(r -> this.putAcq   (r, "/apis/funds"));
-    router.delete("/acq/funds/:id"   ).produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/funds"));
+    router.get(   "/acq/funds/:id"   ).produces(JSON).handler(r -> this.listAcq  (r, DMOD_FUNDS));
+    router.put(   "/acq/funds/:id"   )               .handler(r -> this.putAcq   (r, DMOD_FUNDS));
+    router.delete("/acq/funds/:id"   ).produces(TEXT).handler(r -> this.deleteAcq(r, DMOD_FUNDS));
 
     router.get   ("/acq/invoices"    ).produces(HTML).handler(r -> this.html     (r, "templates/invoices.html"));
-    router.get   ("/acq/invoices"    ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/invoices"));
+    router.get   ("/acq/invoices"    ).produces(JSON).handler(r -> this.listAcq  (r, DMOD_INVOICES));
     router.post  ("/acq/invoices"    )               .handler(this::createInvoice);
 
     router.get   ("/acq/invoices/:id").produces(HTML).handler(r -> this.html     (r, "templates/invoice.html"));
-    router.get   ("/acq/invoices/:id").produces(JSON).handler(r -> this.listAcq  (r, "/apis/invoices"));
-    router.put   ("/acq/invoices/:id")               .handler(r -> this.putAcq   (r, "/apis/invoices"));
-    router.delete("/acq/invoices/:id").produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/invoices"));
+    router.get   ("/acq/invoices/:id").produces(JSON).handler(r -> this.listAcq  (r, DMOD_INVOICES));
+    router.put   ("/acq/invoices/:id")               .handler(r -> this.putAcq   (r, DMOD_INVOICES));
+    router.delete("/acq/invoices/:id").produces(TEXT).handler(r -> this.deleteAcq(r, DMOD_INVOICES));
 
     router.get   ("/acq/po_lines"    ).produces(HTML).handler(r -> this.html     (r, "templates/po_lines.html"));
-    router.get   ("/acq/po_lines"    ).produces(JSON).handler(r -> this.listAcq  (r, "/apis/po_lines"));
+    router.get   ("/acq/po_lines"    ).produces(JSON).handler(r -> this.listAcq  (r, DMOD_PO_LINES));
     router.post  ("/acq/po_lines"    )               .handler(this::createPoLine);
 
     router.get   ("/acq/po_lines/:id").produces(HTML).handler(r -> this.html     (r, "templates/po_line.html"));
-    router.get   ("/acq/po_lines/:id").produces(JSON).handler(r -> this.listAcq  (r, "/apis/po_lines"));
-    router.put   ("/acq/po_lines/:id")               .handler(r -> this.putAcq   (r, "/apis/po_lines"));
-    router.delete("/acq/po_lines/:id").produces(TEXT).handler(r -> this.deleteAcq(r, "/apis/po_lines"));
+    router.get   ("/acq/po_lines/:id").produces(JSON).handler(r -> this.listAcq  (r, DMOD_PO_LINES));
+    router.put   ("/acq/po_lines/:id")               .handler(r -> this.putAcq   (r, DMOD_PO_LINES));
+    router.delete("/acq/po_lines/:id").produces(TEXT).handler(r -> this.deleteAcq(r, DMOD_PO_LINES));
 
     router.getWithRegex("/acq/[a-zA-Z0-9._-]+(\\.css|\\.js)").handler(this::sendFile);
 
