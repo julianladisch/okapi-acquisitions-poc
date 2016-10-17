@@ -32,4 +32,5 @@ Or try JSON request:
 ```
 curl http://localhost:8079/acq/invoices -H "Accept: application/json"
 curl http://localhost:8079/acq/funds    -H "Accept: application/json"
+curl http://localhost:8079/acq/po_lines -H "Accept: application/json"
 ```
