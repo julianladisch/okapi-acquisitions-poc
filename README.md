@@ -27,6 +27,7 @@ java -jar target/okapi-acquisitions-poc-fat.jar
 
 ## Try it out
 Open browser at `http://localhost:8079/acq/invoices`
+
 Or try JSON request:
 ```
 curl http://localhost:8079/acq/invoices -H "Accept: application/json"
