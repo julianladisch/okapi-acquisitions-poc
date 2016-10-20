@@ -23,9 +23,6 @@ public class MainVerticle extends AbstractVerticle {
   private static final String TEXT = "text/plain";
   private static final String HTML = "text/html";
   private static final String X_OKAPI_TENANT = "X-Okapi-Tenant";
-  private static final int ACQ_API_PORT = 8082;
-  private static final String SERVER = "localhost";
-  private static final String TENANT = "hbz";
   private static final String authorization = "a2VybWl0Omtlcm1pdA";
   private static final String DMOD_FUNDS = "/funds";
   private static final String DMOD_INVOICES = "/invoices";
@@ -33,8 +30,20 @@ public class MainVerticle extends AbstractVerticle {
 
   private final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
 
+  private int dataPort = 8083;
+  private String dataServer = "localhost";
+  private String tenant = "hbz";
+
+  private void configure() {
+    dataServer = config().getString("data.api.server", dataServer);
+    dataPort = config().getInteger("data.api.port", dataPort);
+    tenant = config().getString("data.api.tenant", tenant);
+  }
+
   @Override
   public void start(Future<Void> fut) {
+    configure();
+
     Router router = Router.router(vertx);
     final int port = Integer.parseInt(System.getProperty("port", "8079"));
     router.route("/acq/*").handler(BodyHandler.create());
@@ -113,7 +122,7 @@ public class MainVerticle extends AbstractVerticle {
 
   private void list(RoutingContext routingContext, int port, String path) {
     HttpClient httpClient = vertx.createHttpClient();
-    httpClient.get(port, SERVER, finalPath(routingContext, path),
+    httpClient.get(port, dataServer, finalPath(routingContext, path),
         response -> response.bodyHandler(buffer -> {
           try {
             routingContext.response().putHeader(CONTENT_TYPE, JSON).end(buffer);
@@ -123,17 +132,17 @@ public class MainVerticle extends AbstractVerticle {
         }))
         .putHeader(ACCEPT, JSON)
         .putHeader(AUTHORIZATION, authorization)
-        .putHeader(X_OKAPI_TENANT, TENANT)
+        .putHeader(X_OKAPI_TENANT, tenant)
         .end();
   }
 
   private void listAcq(RoutingContext routingContext, String path) {
-    list(routingContext, ACQ_API_PORT, path);
+    list(routingContext, dataPort, path);
   }
 
   private void delete(RoutingContext routingContext, int port, String path) {
     HttpClient httpClient = vertx.createHttpClient();
-    httpClient.delete(port, SERVER, finalPath(routingContext, path),
+    httpClient.delete(port, dataServer, finalPath(routingContext, path),
         response -> response.bodyHandler(buffer -> {
           try {
             routingContext.response().putHeader(CONTENT_TYPE, TEXT)
@@ -144,17 +153,17 @@ public class MainVerticle extends AbstractVerticle {
         }))
         .putHeader(ACCEPT, TEXT)
         .putHeader(AUTHORIZATION, authorization)
-        .putHeader(X_OKAPI_TENANT, TENANT)
+        .putHeader(X_OKAPI_TENANT, tenant)
         .end();
   }
 
   private void deleteAcq(RoutingContext routingContext, String path) {
-    delete(routingContext, ACQ_API_PORT, path);
+    delete(routingContext, dataPort, path);
   }
 
   private void put(RoutingContext routingContext, int port, String path) {
     HttpClient httpClient = vertx.createHttpClient();
-    httpClient.put(port, SERVER, finalPath(routingContext, path),
+    httpClient.put(port, dataServer, finalPath(routingContext, path),
         response -> response.bodyHandler(buffer -> {
           try {
             routingContext.response().putHeader(CONTENT_TYPE, TEXT)
@@ -166,17 +175,17 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(CONTENT_TYPE, JSON)
         .putHeader(ACCEPT, TEXT)
         .putHeader(AUTHORIZATION, authorization)
-        .putHeader(X_OKAPI_TENANT, TENANT)
+        .putHeader(X_OKAPI_TENANT, tenant)
         .end(routingContext.getBody());
   }
 
   private void putAcq(RoutingContext routingContext, String path) {
-    put(routingContext, ACQ_API_PORT, path);
+    put(routingContext, dataPort, path);
   }
 
   private void post(RoutingContext routingContext, int port, String path, String content) {
     HttpClient httpClient = vertx.createHttpClient();
-    httpClient.post(port, SERVER, path,
+    httpClient.post(port, dataServer, path,
         response -> response.bodyHandler(buffer -> {
           try {
             routingContext.response().putHeader(CONTENT_TYPE, JSON)
@@ -188,7 +197,7 @@ public class MainVerticle extends AbstractVerticle {
         .putHeader(CONTENT_TYPE, JSON)
         .putHeader(ACCEPT,       JSON)
         .putHeader(AUTHORIZATION, authorization)
-        .putHeader(X_OKAPI_TENANT, TENANT)
+        .putHeader(X_OKAPI_TENANT, tenant)
         .end(content);
   }
 
@@ -213,7 +222,7 @@ public class MainVerticle extends AbstractVerticle {
       + "}";
     content = content.replace('\'', '"');
 
-    post(routingContext, ACQ_API_PORT, "/apis/funds", content);
+    post(routingContext, dataPort, DMOD_FUNDS, content);
   }
 
   private void createInvoice(RoutingContext routingContext) {
@@ -281,7 +290,7 @@ public class MainVerticle extends AbstractVerticle {
       + "}";
     content = content.replace('\'', '"');
 
-    post(routingContext, ACQ_API_PORT, "/apis/invoices", content);
+    post(routingContext, dataPort, DMOD_INVOICES, content);
   }
 
   private void createPoLine(RoutingContext routingContext) {
@@ -348,7 +357,7 @@ public class MainVerticle extends AbstractVerticle {
       + "}";
     content = content.replace('\'', '"');
 
-    post(routingContext, ACQ_API_PORT, "/apis/po_lines", content);
+    post(routingContext, dataPort, DMOD_PO_LINES, content);
   }
 
   /**
