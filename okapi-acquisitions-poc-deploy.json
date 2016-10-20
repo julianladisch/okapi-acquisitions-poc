@@ -1,0 +1,6 @@
+{
+  "srvcId" : "okapi-acquisitions-poc",
+  "descriptor" : {
+    "exec" : "java -Dport=%p -jar ../okapi-acquisitions-poc/target/okapi-acquisitions-poc-fat.jar -conf ../okapi-acquisitions-poc/application.conf"
+   }
+}

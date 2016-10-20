@@ -1,0 +1,6 @@
+{
+  "srvcId" : "mod-acquisitions",
+  "descriptor" : {
+    "exec" : "java -jar ../mod-acquisitions/target/acquisitions-fat.jar -Dhttp.port=%p embed_mongo=true"
+   }
+}

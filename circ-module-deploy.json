@@ -1,0 +1,6 @@
+{
+  "srvcId" : "circulation",
+  "descriptor" : {
+    "exec" : "java -jar ../mod-circulation/target/circulation-fat.jar -Dhttp.port=%p embed_mongo=true"
+   }
+}

@@ -1,6 +1,0 @@
-{
-  "srvcId" : "okapi-acquisitions-module",
-  "descriptor" : {
-    "exec" : "java -Dport=%p -jar acquisitions/target/okapi-acquisitions-module-fat.jar"
-   }
-}
