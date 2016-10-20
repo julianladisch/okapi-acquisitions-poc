@@ -47,7 +47,7 @@
         $.ajax({
           type: "GET",
           cache: false,
-          headers: { Accept : "application/json" },
+          headers: { Accept: "application/json", "X-Okapi-Tenant": "hbz" },
           success: function(json){
             $('#json').text(JSON.stringify(json, null, "\t"));
           },
@@ -60,7 +60,7 @@
       $('#delete').click(function() {
         $.ajax({
           type: "DELETE",
-          headers: { Accept : "text/plain" },
+          headers: { Accept: "text/plain", "X-Okapi-Tenant": "hbz" },
           success: function(text) {
             $('#json').empty();
             if (! text) {
@@ -80,7 +80,7 @@
       $('#put').click(function() {
         $.ajax({
           type: "PUT",
-          headers: { Accept : "text/plain" },
+          headers: { Accept: "text/plain", "X-Okapi-Tenant": "hbz" },
           data: $('#json').val(),
           contentType: "application/json",
           success: function(text) {

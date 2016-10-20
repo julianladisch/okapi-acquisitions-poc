@@ -47,7 +47,7 @@
         $.ajax({
           type: "POST",
           cache: false,
-          headers: { Accept : "application/json" },
+          headers: { Accept: "application/json", "X-Okapi-Tenant": "hbz" },
           success: function(json) {
             window.location.href = "funds/" + json._id;
           },
@@ -62,7 +62,7 @@
         $.ajax({
           type: "GET",
           cache: false,
-          headers: { Accept : "application/json" },
+          headers: { Accept: "application/json", "X-Okapi-Tenant": "hbz" },
           success: function(json) {
             $('#count').text(json.total_records);
             $('table').empty();
